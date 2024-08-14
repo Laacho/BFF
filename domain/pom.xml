@@ -11,4 +11,16 @@
     <version>${revision}</version>
     <name>domain</name>
     <description>Domain Module</description>
+    <dependencies>
+        <dependency>
+            <groupId>com.tinqinacademy.hotel</groupId>
+            <artifactId>restexport</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.tinqinacademy.Comments</groupId>
+            <artifactId>restexport</artifactId>
+            <version>${revision}</version>
+        </dependency>
+    </dependencies>
 </project>

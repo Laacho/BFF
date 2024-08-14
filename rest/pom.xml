@@ -13,15 +13,11 @@
     <description>Rest Module</description>
     <dependencies>
         <dependency>
-            <groupId>com.tinqinacademy</groupId>
+            <groupId>com.tinqinacademy.bff</groupId>
             <artifactId>core</artifactId>
             <version>${revision}</version>
         </dependency>
-        <dependency>
-            <groupId>com.tinqinacademy</groupId>
-            <artifactId>api</artifactId>
-            <version>${revision}</version>
-        </dependency>
+
     </dependencies>
     <build>
         <plugins>
