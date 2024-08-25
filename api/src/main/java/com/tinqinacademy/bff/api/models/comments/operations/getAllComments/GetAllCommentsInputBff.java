@@ -11,7 +11,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetAllCommentsInput implements OperationInput {
+public class GetAllCommentsInputBff implements OperationInput {
 
     @NotBlank(message = "room id cannot be empty/blank")
     private String roomId;

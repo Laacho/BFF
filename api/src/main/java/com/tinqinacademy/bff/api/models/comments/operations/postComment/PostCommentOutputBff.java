@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @ToString
-public class PostCommentOutput implements  OperationOutput {
+public class PostCommentOutputBff implements  OperationOutput {
     @Size(min = 1,max=10)
     private  String id;
 }

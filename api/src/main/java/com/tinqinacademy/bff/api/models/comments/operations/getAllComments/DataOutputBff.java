@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DataOutput {
+public class DataOutputBff {
     private String id;
     private String firstName;
     private String lastName;

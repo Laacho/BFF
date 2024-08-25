@@ -9,6 +9,6 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeleteCommentOutput implements OperationOutput {
+public class DeleteCommentOutputBff implements OperationOutput {
     private String message;
 }

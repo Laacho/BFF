@@ -1,6 +1,7 @@
 package com.tinqinacademy.bff.domain.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tinqinacademy.authenticationHotel.restExport.RestExportAuthentication;
 import com.tinqinacademy.comments.restexport.RestExportComments;
 import com.tinqinacademy.hotel.restexport.RestExportHotel;
 import feign.Feign;
@@ -30,4 +31,14 @@ public class RestExport {
                 .decoder(new JacksonDecoder(objectMapper))
                 .target(RestExportHotel.class, "http://hotel:8083/");
     }
+    @Bean
+    RestExportAuthentication restExportAuthentication(){
+        ObjectMapper objectMapper = new ObjectMapper();
+        return Feign.builder()
+                .encoder(new JacksonEncoder(objectMapper))
+                .decoder(new JacksonDecoder(objectMapper))
+                .target(RestExportAuthentication.class, "http://authentication:8085");
+    }
+
+
 }

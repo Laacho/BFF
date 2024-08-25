@@ -9,7 +9,7 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class EditCommentOutput implements OperationOutput {
+public class EditCommentOutputBff implements OperationOutput {
 
     private String id;
 }

@@ -15,7 +15,7 @@ import java.util.UUID;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class EditCommentInput implements OperationInput {
+public class EditCommentInputBff implements OperationInput {
     @Size(min = 1)
     @NotNull(message = "content cannot be null")
     private String content;

@@ -9,6 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @Builder
-public class AdminEditCommentOutput implements OperationOutput {
+public class AdminEditCommentOutputBff implements OperationOutput {
     private String id;
 }

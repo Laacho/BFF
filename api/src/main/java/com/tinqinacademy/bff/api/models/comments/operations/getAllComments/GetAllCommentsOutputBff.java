@@ -11,6 +11,6 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Builder
-public class GetAllCommentsOutput implements  OperationOutput {
-   private List<DataOutput> comments;
+public class GetAllCommentsOutputBff implements  OperationOutput {
+   private List<DataOutputBff> comments;
 }

@@ -12,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 @Builder
-public class AdminEditCommentInput implements OperationInput {
+public class AdminEditCommentInputBff implements OperationInput {
     @Hidden
     private String commentId;
     @Size(min = 1,max = 10)

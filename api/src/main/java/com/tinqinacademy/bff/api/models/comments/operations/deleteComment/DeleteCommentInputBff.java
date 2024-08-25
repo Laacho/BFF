@@ -10,7 +10,7 @@ import lombok.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeleteCommentInput implements OperationInput {
+public class DeleteCommentInputBff implements OperationInput {
     @Hidden
     private String commentId;
 

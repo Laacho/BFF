@@ -12,7 +12,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class PostCommentInput implements OperationInput {
+public class PostCommentInputBff implements OperationInput {
 
     @Hidden
     private String roomId;

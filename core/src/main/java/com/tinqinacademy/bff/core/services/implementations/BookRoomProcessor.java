@@ -33,6 +33,7 @@ public class BookRoomProcessor implements BookRoomOperation {
         log.info("Start bookRoom input: {}", input);
         return   Try.of(()->{
                     BookRoomInput result = conversionService.convert(input, BookRoomInput.class);
+
                     BookRoomOutput output = restExportHotel.bookRoom(result, input.getRoomId());
                     log.info("End bookRoom output: {}", output);
                     BookRoomOutputBff outputBff = BookRoomOutputBff.builder()
