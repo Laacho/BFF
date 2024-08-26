@@ -1,4 +1,4 @@
-package com.tinqinacademy.bff.rest;
+package com.tinqinacademy.bff.rest.controllers;
 
 import com.tinqinacademy.bff.api.models.base.OperationOutput;
 import com.tinqinacademy.bff.api.models.exceptions.errorWrapper.ErrorWrapper;
