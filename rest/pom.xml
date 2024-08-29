@@ -13,23 +13,27 @@
     <description>Rest Module</description>
     <dependencies>
         <dependency>
-            <groupId>com.tinqinacademy</groupId>
+            <groupId>com.tinqinacademy.bff</groupId>
             <artifactId>core</artifactId>
             <version>${revision}</version>
         </dependency>
-        <dependency>
-            <groupId>com.tinqinacademy</groupId>
-            <artifactId>api</artifactId>
-            <version>${revision}</version>
-        </dependency>
+
     </dependencies>
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.tinqinacademy.bff.rest.BffApplication</mainClass>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
             </plugin>
-
         </plugins>
     </build>
 </project>
