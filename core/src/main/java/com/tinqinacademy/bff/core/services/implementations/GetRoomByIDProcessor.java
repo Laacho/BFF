@@ -12,6 +12,7 @@ import com.tinqinacademy.bff.core.services.converters.hotelConverters.BedBffToBe
 import com.tinqinacademy.hotel.api.models.operations.getRoomByID.GetRoomByIDInput;
 import com.tinqinacademy.hotel.api.models.operations.getRoomByID.GetRoomByIDOutput;
 import com.tinqinacademy.hotel.restexport.RestExportHotel;
+import feign.FeignException;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,9 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static io.vavr.API.*;
+import static io.vavr.Predicates.instanceOf;
 
 
 @Service
@@ -47,8 +51,11 @@ public class GetRoomByIDProcessor implements GetRoomByIdOperation {
                     GetRoomByIDOutputBff output = outputBuilder(roomsById);
                     log.info("End getRoomById output: {}", output);
                     return output;
-                }).toEither()
-                .mapLeft(errorHandler::handleError);
+                })
+                .toEither()
+                .mapLeft(throwable -> Match(throwable).of(
+                        Case($(instanceOf(FeignException.class)), errorHandler::handleFeignException),
+                        Case($(), errorHandler::handleError)));
     }
 
     private GetRoomByIDOutputBff outputBuilder(GetRoomByIDOutput roomsById) {

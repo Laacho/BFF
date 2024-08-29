@@ -1,6 +1,7 @@
 package com.tinqinacademy.bff.api.models.comments.operations.editComment;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tinqinacademy.bff.api.models.base.OperationInput;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,8 +21,11 @@ public class EditCommentInputBff implements OperationInput {
     @NotNull(message = "content cannot be null")
     private String content;
 
-    @NotBlank(message = "id cannot be empty/blank")
-    private UUID id;
+    @JsonIgnore
+    private UUID commentId;
+
+    @JsonIgnore
+    private String userId;
 }
 
 

@@ -8,11 +8,15 @@ import com.tinqinacademy.bff.api.models.hotel.operations.partialUpdateRoom.Parti
 import com.tinqinacademy.hotel.api.models.operations.partialUpdateRoom.PartialUpdateRoomInput;
 import com.tinqinacademy.hotel.api.models.operations.partialUpdateRoom.PartialUpdateRoomOutput;
 import com.tinqinacademy.hotel.restexport.RestExportHotel;
+import feign.FeignException;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
+
+import static io.vavr.API.*;
+import static io.vavr.Predicates.instanceOf;
 
 @Service
 @Slf4j
@@ -39,8 +43,11 @@ public class PartialUpdateProcessor implements PartialUpdateRoomOperation {
                             .build();
                     log.info("End partialUpdateRoom output: {}", result);
                     return result;
-                }).toEither()
-                .mapLeft(errorHandler::handleError);
+                })
+                .toEither()
+                .mapLeft(throwable -> Match(throwable).of(
+                        Case($(instanceOf(FeignException.class)), errorHandler::handleFeignException),
+                        Case($(), errorHandler::handleError)));
 
     }
 }

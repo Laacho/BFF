@@ -7,12 +7,16 @@ import com.tinqinacademy.bff.api.models.hotel.operations.registerVisitor.Registe
 import com.tinqinacademy.hotel.api.models.operations.registerVisitor.RegisterVisitorInput;
 import com.tinqinacademy.hotel.api.models.operations.registerVisitor.RegisterVisitorOutput;
 import com.tinqinacademy.hotel.restexport.RestExportHotel;
+import feign.FeignException;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 import com.tinqinacademy.bff.api.models.exceptions.errorHandler.ErrorHandler;
+
+import static io.vavr.API.*;
+import static io.vavr.Predicates.instanceOf;
 
 
 @Service
@@ -40,7 +44,10 @@ public class RegisterVisitorProcessor implements RegisterVisitorOperation {
                             .build();
                     log.info("End registerRoom output: {}", output);
                     return output;
-                }).toEither()
-                .mapLeft(errorHandler::handleError);
+                })
+                .toEither()
+                .mapLeft(throwable -> Match(throwable).of(
+                        Case($(instanceOf(FeignException.class)), errorHandler::handleFeignException),
+                        Case($(), errorHandler::handleError)));
     }
 }

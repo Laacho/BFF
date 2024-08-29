@@ -1,11 +1,9 @@
 package com.tinqinacademy.bff.api.models.hotel.operations.bookRoom;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tinqinacademy.bff.api.models.base.OperationInput;
 import io.swagger.v3.oas.annotations.Hidden;
-import jakarta.validation.constraints.FutureOrPresent;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -16,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Builder
+@Builder(toBuilder = true)
 public class BookRoomInputBff implements OperationInput {
     @Hidden
     private UUID roomId;
@@ -35,7 +33,9 @@ public class BookRoomInputBff implements OperationInput {
     private String phoneNumber;
     @Past(message = "must a past date")
     private LocalDate birthdate;
-    @Size(min = 5,max = 30)
-    @NotNull(message ="email cannot be null")
+    @NotBlank(message = "email cannot be blank")
     private String email;
+
+    @JsonIgnore
+    private String userId;
 }

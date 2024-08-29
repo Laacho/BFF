@@ -8,11 +8,15 @@ import com.tinqinacademy.bff.api.models.hotel.operations.getFreeRooms.GetFreeRoo
 import com.tinqinacademy.hotel.api.models.operations.getFreeRooms.GetFreeRoomsInput;
 import com.tinqinacademy.hotel.api.models.operations.getFreeRooms.GetFreeRoomsOutput;
 import com.tinqinacademy.hotel.restexport.RestExportHotel;
+import feign.FeignException;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
+
+import static io.vavr.API.*;
+import static io.vavr.Predicates.instanceOf;
 
 
 @Service
@@ -45,6 +49,8 @@ public class GetFreeRoomsProcessor implements GetFreeRoomsOperation {
                     return outputBff;
                 })
                 .toEither()
-                .mapLeft(errorHandler::handleError);
+                .mapLeft(throwable -> Match(throwable).of(
+                        Case($(instanceOf(FeignException.class)), errorHandler::handleFeignException),
+                        Case($(), errorHandler::handleError)));
     }
 }

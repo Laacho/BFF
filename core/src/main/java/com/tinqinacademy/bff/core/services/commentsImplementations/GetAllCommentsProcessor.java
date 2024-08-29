@@ -10,6 +10,7 @@ import com.tinqinacademy.bff.core.services.converters.commentsConverters.DataBff
 import com.tinqinacademy.comments.api.modules.operations.getAllComments.GetAllCommentsInput;
 import com.tinqinacademy.comments.api.modules.operations.getAllComments.GetAllCommentsOutput;
 import com.tinqinacademy.comments.restexport.RestExportComments;
+import feign.FeignException;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,9 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static io.vavr.API.*;
+import static io.vavr.Predicates.instanceOf;
 
 @Slf4j
 @Service
@@ -45,7 +49,10 @@ public class GetAllCommentsProcessor implements GetAllCommentsOperation {
                             .build();
                     log.info("End getAllComments outputBff: {}", outputBff);
                     return outputBff;
-                }).toEither()
-                .mapLeft(errorHandler::handleError);
+                })
+                .toEither()
+                .mapLeft(throwable -> Match(throwable).of(
+                        Case($(instanceOf(FeignException.class)), errorHandler::handleFeignException),
+                        Case($(), errorHandler::handleError)));
     }
 }

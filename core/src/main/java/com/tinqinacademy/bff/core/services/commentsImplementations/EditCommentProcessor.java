@@ -8,11 +8,15 @@ import com.tinqinacademy.bff.api.models.exceptions.errorWrapper.ErrorWrapper;
 import com.tinqinacademy.comments.api.modules.operations.editComment.EditCommentInput;
 import com.tinqinacademy.comments.api.modules.operations.editComment.EditCommentOutput;
 import com.tinqinacademy.comments.restexport.RestExportComments;
+import feign.FeignException;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
+
+import static io.vavr.API.*;
+import static io.vavr.Predicates.instanceOf;
 
 
 @Service
@@ -41,6 +45,8 @@ public class EditCommentProcessor implements EditCommentOperation {
                     return outputBff;
                 })
                 .toEither()
-                .mapLeft(errorHandler::handleError);
+                .mapLeft(throwable -> Match(throwable).of(
+                        Case($(instanceOf(FeignException.class)), errorHandler::handleFeignException),
+                        Case($(), errorHandler::handleError)));
     }
 }

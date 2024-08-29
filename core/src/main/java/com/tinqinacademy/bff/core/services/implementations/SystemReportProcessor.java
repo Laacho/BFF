@@ -8,6 +8,7 @@ import com.tinqinacademy.bff.api.models.hotel.operations.systemRepost.SystemRepo
 import com.tinqinacademy.bff.core.services.converters.hotelConverters.DataToDataBff;
 import com.tinqinacademy.hotel.api.models.operations.systemRepost.SystemReportInput;
 import com.tinqinacademy.hotel.api.models.operations.systemRepost.SystemRepostOutput;
+import feign.FeignException;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,9 @@ import org.springframework.stereotype.Service;
 import com.tinqinacademy.bff.api.models.exceptions.errorHandler.ErrorHandler;
 
 import java.util.List;
+
+import static io.vavr.API.*;
+import static io.vavr.Predicates.instanceOf;
 
 
 @Service
@@ -61,7 +65,10 @@ public class SystemReportProcessor implements SystemReportOperation {
                             .build();
                     log.info("End getRegisterInfo output: {}", output);
                     return output;
-                }).toEither()
-                .mapLeft(errorHandler::handleError);
+                })
+                .toEither()
+                .mapLeft(throwable -> Match(throwable).of(
+                        Case($(instanceOf(FeignException.class)), errorHandler::handleFeignException),
+                        Case($(), errorHandler::handleError)));
     }
 }

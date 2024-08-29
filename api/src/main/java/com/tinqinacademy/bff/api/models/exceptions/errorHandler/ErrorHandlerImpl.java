@@ -1,5 +1,7 @@
 package com.tinqinacademy.bff.api.models.exceptions.errorHandler;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tinqinacademy.bff.api.models.base.OperationInput;
 import com.tinqinacademy.bff.api.models.exceptions.baseError.Error;
 import com.tinqinacademy.bff.api.models.exceptions.customException.InputDataException;
@@ -7,10 +9,12 @@ import com.tinqinacademy.bff.api.models.exceptions.customException.InvalidBedTyp
 import com.tinqinacademy.bff.api.models.exceptions.customException.InvalidRoomByIdExceptions;
 import com.tinqinacademy.bff.api.models.exceptions.customException.InvalidRoomByRoomNumberException;
 import com.tinqinacademy.bff.api.models.exceptions.errorWrapper.ErrorWrapper;
+import feign.FeignException;
 import jakarta.validation.ConstraintViolation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
+import org.springframework.web.ErrorResponse;
 
 import java.util.List;
 import java.util.Set;
@@ -19,17 +23,7 @@ import java.util.Set;
 public class ErrorHandlerImpl implements ErrorHandler {
     @Override
     public ErrorWrapper handleError(Throwable t) {
-        if (t instanceof InvalidRoomByIdExceptions) {
-            ErrorWrapper errorWrapper = ErrorWrapper.builder().build();
-            errorWrapper.addErrors(
-                    Error.builder()
-                            .status(HttpStatus.NOT_FOUND)
-                            .statusCode(HttpStatus.NOT_FOUND.value())
-                            .message(t.getMessage())
-                            .build());
-            return errorWrapper;
-        }
-        if (t instanceof IllegalArgumentException) {
+        if(t!=null){
             ErrorWrapper errorWrapper = ErrorWrapper.builder().build();
             errorWrapper.addErrors(
                     Error.builder()
@@ -39,38 +33,6 @@ public class ErrorHandlerImpl implements ErrorHandler {
                             .build());
             return errorWrapper;
         }
-        if (t instanceof InputDataException) {
-            ErrorWrapper errorWrapper = ErrorWrapper.builder().build();
-            errorWrapper.addErrors(
-                    Error.builder()
-                            .status(HttpStatus.BAD_REQUEST)
-                            .statusCode(HttpStatus.BAD_REQUEST.value())
-                            .message(t.getMessage())
-                            .build());
-            return errorWrapper;
-        }
-        if (t instanceof InvalidBedTypeException) {
-            ErrorWrapper errorWrapper = ErrorWrapper.builder().build();
-            errorWrapper.addErrors(
-                    Error.builder()
-                            .status(HttpStatus.NOT_FOUND)
-                            .statusCode(HttpStatus.NOT_FOUND.value())
-                            .message(t.getMessage())
-                            .build()
-            );
-            return errorWrapper;
-        }
-        if(t instanceof InvalidRoomByRoomNumberException){
-            ErrorWrapper errorWrapper = ErrorWrapper.builder().build();
-            errorWrapper.addErrors(
-                    Error.builder()
-                            .status(HttpStatus.BAD_REQUEST)
-                            .statusCode(HttpStatus.BAD_REQUEST.value())
-                            .message(t.getMessage())
-                            .build());
-            return errorWrapper;
-        }
-
         return null;
 
     }
@@ -82,10 +44,25 @@ public class ErrorHandlerImpl implements ErrorHandler {
                         .statusCode(statusCode.value())
                         .build())
                 .toList();
-
-        ErrorWrapper build = ErrorWrapper.builder()
+        return ErrorWrapper.builder()
                 .errors(responses)
                 .build();
-        return build;
+    }
+    public ErrorWrapper handleFeignException(FeignException ex) {
+        try {
+            String errorBody = ex.contentUTF8();
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode errorNode = objectMapper.readTree(errorBody);
+            return objectMapper.treeToValue(errorNode, ErrorWrapper.class);
+        } catch (Exception e) {
+            return ErrorWrapper
+                    .builder()
+                    .errors(List.of(Error.builder()
+                            .message("An error occurred while processing your request")
+                                    .status(HttpStatus.valueOf(ex.status()))
+                                    .statusCode(HttpStatus.valueOf(ex.status()).value())
+                            .build()))
+                    .build();
+        }
     }
 }

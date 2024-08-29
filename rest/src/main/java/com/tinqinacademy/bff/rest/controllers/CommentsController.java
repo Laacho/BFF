@@ -15,6 +15,7 @@ import com.tinqinacademy.bff.api.models.comments.operations.getAllComments.GetAl
 import com.tinqinacademy.bff.api.models.comments.operations.postComment.PostCommentInputBff;
 import com.tinqinacademy.bff.api.models.comments.operations.postComment.PostCommentOperation;
 import com.tinqinacademy.bff.api.models.exceptions.errorWrapper.ErrorWrapper;
+import com.tinqinacademy.bff.rest.context.UserContex;
 import com.tinqinacademy.comments.api.modules.operations.adminEditComment.AdminEditCommentInput;
 import com.tinqinacademy.comments.api.modules.operations.postComment.PostCommentInput;
 import com.tinqinacademy.comments.core.services.paths.CommentsURLPaths;
@@ -35,13 +36,14 @@ public class CommentsController extends BaseController {
     private final EditCommentOperation editCommentOperation;
     private final AdminEditCommentOperation adminEditCommentOperation;
     private final DeleteCommentOperation deleteCommentOperation;
-
-    public CommentsController(GetAllCommentsOperation getAllCommentsOperation, PostCommentOperation postCommentOperation, EditCommentOperation editCommentOperation, AdminEditCommentOperation adminEditCommentOperation, DeleteCommentOperation deleteCommentOperation) {
+    private final UserContex userContex;
+    public CommentsController(GetAllCommentsOperation getAllCommentsOperation, PostCommentOperation postCommentOperation, EditCommentOperation editCommentOperation, AdminEditCommentOperation adminEditCommentOperation, DeleteCommentOperation deleteCommentOperation, UserContex userContex) {
         this.getAllCommentsOperation = getAllCommentsOperation;
         this.postCommentOperation = postCommentOperation;
         this.editCommentOperation = editCommentOperation;
         this.adminEditCommentOperation = adminEditCommentOperation;
         this.deleteCommentOperation = deleteCommentOperation;
+        this.userContex = userContex;
     }
 
 
@@ -67,8 +69,7 @@ public class CommentsController extends BaseController {
                                           @RequestBody PostCommentInput input) {
         PostCommentInputBff result = PostCommentInputBff.builder()
                 .roomId(roomID)
-                .firstName(input.getFirstName())
-                .lastName(input.getLastName())
+                .userId(userContex.getUserId())
                 .content(input.getContent())
                 .build();
         return handleResponse(postCommentOperation.process(result));
@@ -82,7 +83,8 @@ public class CommentsController extends BaseController {
     public ResponseEntity<?> editComment(@PathVariable String commentId,@RequestBody String content){
         EditCommentInputBff input = EditCommentInputBff.builder()
                 .content(content)
-                .id(UUID.fromString(commentId))
+                .commentId(UUID.fromString(commentId))
+                .userId(userContex.getUserId())
                 .build();
         Either<ErrorWrapper, EditCommentOutputBff> process = editCommentOperation.process(input);
         return handleResponse(process);
@@ -94,13 +96,10 @@ public class CommentsController extends BaseController {
             @ApiResponse(responseCode = "400", description = "Bad Request"),
             @ApiResponse(responseCode = "404", description = "Comment not found")})
     @Operation(summary = "admin edits comments")
-    public ResponseEntity<?> adminEditComment(@PathVariable String commentId,  @RequestBody AdminEditCommentInput input){
-        AdminEditCommentInputBff inputFinal = AdminEditCommentInputBff.builder()
+    public ResponseEntity<?> adminEditComment(@PathVariable String commentId,  @RequestBody AdminEditCommentInputBff input){
+        AdminEditCommentInputBff inputFinal = input.toBuilder()
                 .commentId(commentId)
-                .content(input.getContent())
-                .firstName(input.getFirstName())
-                .lastName(input.getLastName())
-                .roomNumber(input.getRoomNumber())
+                .userId(UUID.fromString(userContex.getUserId()))
                 .build();
         Either<ErrorWrapper, AdminEditCommentOutputBff> result = adminEditCommentOperation.process(inputFinal);
         return handleResponse(result);

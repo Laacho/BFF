@@ -11,10 +11,8 @@ public class AdminEditCommentBffToAdminEditComment implements Converter<AdminEdi
     public AdminEditCommentInput convert(AdminEditCommentInputBff source) {
         return AdminEditCommentInput.builder()
                 .commentId(source.getCommentId())
-                .roomNumber(source.getRoomNumber())
-                .firstName(source.getFirstName())
-                .lastName(source.getLastName())
                 .content(source.getContent())
+
                 .build();
     }
 }

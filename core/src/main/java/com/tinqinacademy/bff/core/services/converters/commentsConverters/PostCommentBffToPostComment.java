@@ -11,8 +11,6 @@ public class PostCommentBffToPostComment implements Converter<PostCommentInputBf
     public PostCommentInput convert(PostCommentInputBff source) {
         return PostCommentInput.builder()
                 .roomId(source.getRoomId())
-                .firstName(source.getFirstName())
-                .lastName(source.getLastName())
                 .content(source.getContent())
                 .build();
     }

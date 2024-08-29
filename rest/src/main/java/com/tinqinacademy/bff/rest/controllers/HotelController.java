@@ -31,6 +31,7 @@ import com.tinqinacademy.bff.api.models.hotel.operations.unbookRoom.UnbookRoomOu
 import com.tinqinacademy.bff.api.models.hotel.operations.updateRoom.UpdateRoomInputBff;
 import com.tinqinacademy.bff.api.models.hotel.operations.updateRoom.UpdateRoomOperation;
 import com.tinqinacademy.bff.api.models.hotel.operations.updateRoom.UpdateRoomOutputBff;
+import com.tinqinacademy.bff.rest.context.UserContex;
 import com.tinqinacademy.hotel.core.services.paths.HotelURLPaths;
 import io.swagger.v3.oas.annotations.Operation;
 import io.vavr.control.Either;
@@ -53,9 +54,10 @@ public class HotelController extends BaseController {
     private final UpdateRoomOperation updateRoomOperation;
     private final PartialUpdateRoomOperation partialUpdateRoomOperation;
     private final DeleteRoomOperation deleteRoomOperation;
+    private final UserContex userContex;
 
 
-    public HotelController(BookRoomOperation bookRoomOperation, GetFreeRoomsOperation getFreeRoomsOperation, GetRoomByIdOperation getRoomByIdOperation, UnbookRoomOperation unbookRoomOperation, RegisterVisitorOperation registerVisitorOperation, SystemReportOperation systemReportOperation, CreateRoomOperation createRoomOperation, UpdateRoomOperation updateRoomOperation, PartialUpdateRoomOperation partialUpdateRoomOperation, DeleteRoomOperation deleteRoomOperation) {
+    public HotelController(BookRoomOperation bookRoomOperation, GetFreeRoomsOperation getFreeRoomsOperation, GetRoomByIdOperation getRoomByIdOperation, UnbookRoomOperation unbookRoomOperation, RegisterVisitorOperation registerVisitorOperation, SystemReportOperation systemReportOperation, CreateRoomOperation createRoomOperation, UpdateRoomOperation updateRoomOperation, PartialUpdateRoomOperation partialUpdateRoomOperation, DeleteRoomOperation deleteRoomOperation, UserContex userContex) {
         this.bookRoomOperation = bookRoomOperation;
         this.getFreeRoomsOperation = getFreeRoomsOperation;
         this.getRoomByIdOperation = getRoomByIdOperation;
@@ -66,6 +68,7 @@ public class HotelController extends BaseController {
         this.updateRoomOperation = updateRoomOperation;
         this.partialUpdateRoomOperation = partialUpdateRoomOperation;
         this.deleteRoomOperation = deleteRoomOperation;
+        this.userContex = userContex;
     }
 
     //hotel
@@ -73,17 +76,13 @@ public class HotelController extends BaseController {
     @Operation(summary = "books a rooms DONE")
     public ResponseEntity<?> bookRoom(@RequestBody BookRoomInputBff input,
                                       @PathVariable UUID roomId) {
-        BookRoomInputBff.builder()
+
+        BookRoomInputBff build = input.toBuilder()
                 .roomId(roomId)
-                .firstName(input.getFirstName())
-                .lastName(input.getLastName())
-                .startDate(input.getStartDate())
-                .endDate(input.getEndDate())
-                .birthdate(input.getBirthdate())
-                .email(input.getEmail())
-                .phoneNumber(input.getPhoneNumber())
+                .userId(userContex.getUserId())
                 .build();
-        Either<ErrorWrapper, BookRoomOutputBff> process = bookRoomOperation.process(input);
+
+        Either<ErrorWrapper, BookRoomOutputBff> process = bookRoomOperation.process(build);
         return handleResponse(process);
     }
 

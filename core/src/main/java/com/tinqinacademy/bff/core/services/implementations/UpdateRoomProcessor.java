@@ -8,11 +8,15 @@ import com.tinqinacademy.bff.api.models.hotel.operations.updateRoom.UpdateRoomOu
 import com.tinqinacademy.hotel.api.models.operations.updateRoom.UpdateRoomInput;
 import com.tinqinacademy.hotel.api.models.operations.updateRoom.UpdateRoomOutput;
 import com.tinqinacademy.hotel.restexport.RestExportHotel;
+import feign.FeignException;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
+
+import static io.vavr.API.*;
+import static io.vavr.Predicates.instanceOf;
 
 @Service
 @Slf4j
@@ -38,8 +42,11 @@ public class UpdateRoomProcessor implements UpdateRoomOperation {
                             .build();
                     log.info("End updateRoom output: {}", output);
                     return output;
-                }).toEither()
-                .mapLeft(errorHandler::handleError);
+                })
+                .toEither()
+                .mapLeft(throwable -> Match(throwable).of(
+                        Case($(instanceOf(FeignException.class)), errorHandler::handleFeignException),
+                        Case($(), errorHandler::handleError)));
 
 
     }

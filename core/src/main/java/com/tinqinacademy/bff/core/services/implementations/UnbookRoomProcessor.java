@@ -8,11 +8,15 @@ import com.tinqinacademy.bff.api.models.hotel.operations.unbookRoom.UnbookRoomOu
 import com.tinqinacademy.hotel.api.models.operations.unbookRoom.UnbookRoomInput;
 import com.tinqinacademy.hotel.api.models.operations.unbookRoom.UnbookRoomOutput;
 import com.tinqinacademy.hotel.restexport.RestExportHotel;
+import feign.FeignException;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.stereotype.Service;
+
+import static io.vavr.API.*;
+import static io.vavr.Predicates.instanceOf;
 
 @Service
 @Slf4j
@@ -38,7 +42,10 @@ public class UnbookRoomProcessor implements UnbookRoomOperation {
                             .build();
                     log.info("End deleteRoom output: {}", output);
                     return output;
-                }).toEither()
-                .mapLeft(errorHandler::handleError);
+                })
+                .toEither()
+                .mapLeft(throwable -> Match(throwable).of(
+                        Case($(instanceOf(FeignException.class)), errorHandler::handleFeignException),
+                        Case($(), errorHandler::handleError)));
     }
 }
